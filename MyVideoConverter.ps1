@@ -6,7 +6,7 @@ param (
 	[bool] $shouldProcessImages = $False,
 	
 	[Parameter(Mandatory=$False)] 
-	[bool] $shouldProcessAudioDuration = $False,
+	[bool] $shouldComputeAudioDuration = $False,
 	
 	[Parameter(Mandatory=$False)] 
 	[bool] $shouldConvertAudio = $True,
@@ -68,7 +68,7 @@ function Convert-SourceAudioFiles
 	{
 		$audioDurationFileName = $($audioDurationPath + $audioFile.BaseName + ".duration.txt");
 
-		if ($shouldProcessAudioDuration)
+		if ($shouldComputeAudioDuration)
 		{
 			Get-AudioDuration -inAudioFile $audioFile -outAudioFile $audioDurationFileName;
 		}
@@ -165,6 +165,7 @@ function Convert-AudioFileToVideo
 
 	$videoTitleFull = Get-VideoMetaDataFullTitle -outVideoFileName $outVideoFile;
 
+	#run ffmpeg to create slideshow with the audio
 	C:\Work\ffmpegconverter\bin\ffmpeg.exe `
 	-loglevel error -stats `
 	-r $frameRate -start_number 1 `
@@ -182,10 +183,42 @@ function Convert-AudioFileToVideo
 	-t $inAudioDuration `
 	-y .\input.mp4;
 
+	#Add logo and scrolling title to the video created
 	C:\Work\ffmpegconverter\bin\AddTitleAndLogo.bat $("""Srimad Bhagavatam " + $videoTitleFull + """") "$outVideoFile"
 	
 	Remove-Item -Path .\input.mp4
+}
 
+
+Write-Host "Ensure destination folders exist" -ForegroundColor Green
+New-Item -ItemType Directory -Force -Path $imagesDestPath
+New-Item -ItemType Directory -Force -Path $videosDestPath
+New-Item -ItemType Directory -Force -Path $audioDurationPath
+
+if ($shouldProcessImages)
+{
+	Convert-SourceImageFiles;
+}
+
+Convert-SourceAudioFiles
+
+
+
+
+
+<#==================================== BACKUP =========================================================#>
+
+<#
+	# Working SlideShow
+	C:\Work\ffmpegconverter\bin\ffmpeg.exe -loglevel error -stats -r $frameRate -start_number 1 -i $imagesParam -i $inAudioFile -metadata title=$videoTitleFull -metadata album=$videoAlbum -metadata album_artist=$videoAlbumArtist -c:v libx264 -pix_fmt yuv420p -s $(($videoResolutionWidth)+'x'+($videoResolutionHeight)) -c:a aac -r $frameRateRaw -strict experimental -shortest -max_muxing_queue_size 8192 -vf drawbox="y=ih/PHI:color=black@0.4:width=iw:height=48:t=fill,drawtext=fontfile='c\:\/windows\/fonts\/arial.ttf':text=($videoTitleFull):fontcolor=yellow:fontsize=24:x=(w-tw)/2:y=(h/PHI)+th" -t $inAudioDuration -y $outVideoFile;
+
+#>
+
+<##>
+
+
+<# Backup code for video convertedr
+=====================================
 	#working DrawText and DrawBox	
 	#-vf drawbox="y=ih/PHI:color=black@0.4:width=iw:height=48:t=fill,drawtext=fontfile='c\:\/windows\/fonts\/arial.ttf':text=($videoTitleFull):fontcolor=yellow:fontsize=24:x=(w-tw)/2:y=(h/PHI)+th" `
 
@@ -209,31 +242,7 @@ function Convert-AudioFileToVideo
 
 	#No audio / crossfade
 	#C:\Work\ffmpegconverter\bin\ffmpeg.exe  -loglevel error -stats -i ".\Images\Image%d.jpg" -filter_complex "zoompan=d=(5+1)/1:fps=1/1,framerate=25:interp_start=0:interp_end=255:scene=100" -y ".\Images\Imagetest.mp4"
-}
 
 
-Write-Host "Ensure destination folders exist" -ForegroundColor Green
-New-Item -ItemType Directory -Force -Path $imagesDestPath
-New-Item -ItemType Directory -Force -Path $videosDestPath
-New-Item -ItemType Directory -Force -Path $audioDurationPath
-
-if ($shouldProcessImages)
-{
-	Convert-SourceImageFiles;
-}
-
-Convert-SourceAudioFiles
-
-
-
-
-
-
-
-<#
-	# Working SlideShow
-	C:\Work\ffmpegconverter\bin\ffmpeg.exe -loglevel error -stats -r $frameRate -start_number 1 -i $imagesParam -i $inAudioFile -metadata title=$videoTitleFull -metadata album=$videoAlbum -metadata album_artist=$videoAlbumArtist -c:v libx264 -pix_fmt yuv420p -s $(($videoResolutionWidth)+'x'+($videoResolutionHeight)) -c:a aac -r $frameRateRaw -strict experimental -shortest -max_muxing_queue_size 8192 -vf drawbox="y=ih/PHI:color=black@0.4:width=iw:height=48:t=fill,drawtext=fontfile='c\:\/windows\/fonts\/arial.ttf':text=($videoTitleFull):fontcolor=yellow:fontsize=24:x=(w-tw)/2:y=(h/PHI)+th" -t $inAudioDuration -y $outVideoFile;
 
 #>
-
-<##>
