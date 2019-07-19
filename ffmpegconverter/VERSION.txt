@@ -1,0 +1,2 @@
+ffmpeg-4.1.4-win64-shared.zip
+https://ffmpeg.zeranoe.com/builds/win64/shared/ffmpeg-4.1.4-win64-shared.zip
