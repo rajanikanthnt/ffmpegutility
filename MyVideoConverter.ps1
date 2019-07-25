@@ -1,5 +1,6 @@
 ﻿#
-# Script.ps1
+# Convert .m4a files into mp4 video files with a image slide show and
+# running title text.
 #
 param (
 	[Parameter(Mandatory=$False)] 
@@ -17,7 +18,8 @@ param (
 
 
 
-$ffmpegPath = "C:\Work\ffmpegconverter\bin\";
+$ffmpegRelativePath = ".\ffmpegconverter\bin\";
+$ffmpegPath = "";
 #$ffProbe = $($ffmpegPath + "ffprobe.exe");
 #s$ffmpeg = $($ffmpegPath + "ffprobe.exe");
 $audiosSourcePath = "C:\Users\rajanik\OneDrive\Parayanam\Srimad Bhagavatam\Bhagavatam Parayanam\" #"C:\Work\ffmpegconverter\bin\";
@@ -190,6 +192,10 @@ function Convert-AudioFileToVideo
 }
 
 
+$ffmpegPath = Resolve-Path -Path $ffmpegRelativePath
+Write-Host "FFMPEG ONVERTER PATH: " + $ffmpegPath -ForegroundColor Green
+
+
 Write-Host "Ensure destination folders exist" -ForegroundColor Green
 New-Item -ItemType Directory -Force -Path $imagesDestPath
 New-Item -ItemType Directory -Force -Path $videosDestPath
@@ -197,10 +203,10 @@ New-Item -ItemType Directory -Force -Path $audioDurationPath
 
 if ($shouldProcessImages)
 {
-	Convert-SourceImageFiles;
+	#Convert-SourceImageFiles;
 }
 
-Convert-SourceAudioFiles
+#Convert-SourceAudioFiles
 
 
 
