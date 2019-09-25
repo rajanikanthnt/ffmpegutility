@@ -18,23 +18,26 @@ param (
 
 
 
-$ffmpegRelativePath = ".\ffmpegconverter\bin\";
-$ffmpegPath = "";
+$utilityPath = ".\";
+$binPath = $($utilityPath + "ffmpegconverter\bin\");
+$outputPath = ".\Output\";
+
 #$ffProbe = $($ffmpegPath + "ffprobe.exe");
 #s$ffmpeg = $($ffmpegPath + "ffprobe.exe");
 $audiosSourcePath = "C:\Users\rajanik\OneDrive\Parayanam\Srimad Bhagavatam\Bhagavatam Parayanam\" #"C:\Work\ffmpegconverter\bin\";
 $imagesSourcePath = "C:\Users\rajanik\OneDrive\Photos\Krishna\";
-$audioDurationPath = $($ffmpegPath + "AudioDuration\");
-$imagesDestPath = $($ffmpegPath + "Images\");
-$videosDestPath = $($ffmpegPath + "Videos\");
-$imageResolutionWidth = "1280";
-$imageResolutionHeight = "720";
+
+$audioDurationPath = $($outputPath + "Temp\AudioDuration\");
+$imagesDestPath = $($outputPath + "Images\");
+$videosDestPath = $($outputPath + "Videos\");
+$imageResolutionWidth = "1920";
+$imageResolutionHeight = "1080";
 $videoResolutionWidth = "480";
 $videoResolutionHeight = "360";
 $imagesPerVideo = 50;
 function Convert-SourceImageFiles
 {
-	Set-Location -Path $ffmpegPath
+	#Set-Location -Path $ffmpegPath
 
 	$imageFiles = Get-ChildItem -Path $($imagesSourcePath + "*") -Include "*.jpg";
 	$fileIndex = 1;
@@ -53,7 +56,7 @@ function Convert-SourceImageFile
 {
 	param ([System.IO.FileInfo]$inImageFile, [string]$outImageFile)
 
-	C:\Work\ffmpegconverter\bin\ffmpeg.exe -i $('"'+ $inImageFile.FullName + '"') `
+	.\ffmpegconverter\bin\ffmpeg.exe -i $('"'+ $inImageFile.FullName + '"') `
 	-loglevel error -stats `
 	-vf "scale=($imageResolutionWidth):($imageResolutionHeight):force_original_aspect_ratio=decrease,pad=($imageResolutionWidth):($imageResolutionHeight):(ow-iw)/2:(oh-ih)/2,setsar=1" `
 	-y $('"' + $outImageFile + '"' );
@@ -61,7 +64,7 @@ function Convert-SourceImageFile
 
 function Convert-SourceAudioFiles
 {
-	Set-Location -Path $ffmpegPath
+	#Set-Location -Path $ffmpegPath
 
 	#Get audio duration for all audio files
 	$audioFiles = Get-ChildItem -Path $($audiosSourcePath + "*") -Include "*.m4a";
@@ -148,7 +151,7 @@ function Convert-AudioFileToVideo
 	Write-Host $inAudioFile -ForegroundColor Magenta
 	Write-Host $outVideoFile -ForegroundColor Magenta
 
-	$imagesParam = ".\Images\Image%d.jpg";
+	$imagesParam = $($imagesDestPath + "Image%d.jpg");
 
 	$durationTimeSpan = [System.TimeSpan]::FromSeconds($inAudioDuration);
 	Write-Host $durationTimeSpan -ForegroundColor Magenta
@@ -162,13 +165,10 @@ function Convert-AudioFileToVideo
 	$videoAlbum = "Srimad Bhagavatam Parayanam";
 	$videoAlbumArtist = "Rajanikanth Thandavan"
 
-	$hyphenPosition = $videoTitle.IndexOf("-");
-	$videoTitle = $videoTitle.Remove(0, $hyphenPosition + 1);
-
 	$videoTitleFull = Get-VideoMetaDataFullTitle -outVideoFileName $outVideoFile;
 
 	#run ffmpeg to create slideshow with the audio
-	C:\Work\ffmpegconverter\bin\ffmpeg.exe `
+	.\ffmpegconverter\bin\ffmpeg.exe `
 	-loglevel error -stats `
 	-r $frameRate -start_number 1 `
 	-i $imagesParam `
@@ -186,7 +186,7 @@ function Convert-AudioFileToVideo
 	-y .\input.mp4;
 
 	#Add logo and scrolling title to the video created
-	C:\Work\ffmpegconverter\bin\AddTitleAndLogo.bat $("""Srimad Bhagavatam " + $videoTitleFull + """") "$outVideoFile"
+	.\AddTitleAndLogo.bat $("""Srimad Bhagavatam " + $videoTitleFull + """") "$outVideoFile"
 	
 	Remove-Item -Path .\input.mp4
 }
