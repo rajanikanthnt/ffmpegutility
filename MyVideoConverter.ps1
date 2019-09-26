@@ -35,6 +35,8 @@ $imageResolutionHeight = "1080";
 $videoResolutionWidth = "480";
 $videoResolutionHeight = "360";
 $imagesPerVideo = 50;
+
+
 function Convert-SourceImageFiles
 {
 	#Set-Location -Path $ffmpegPath
@@ -192,8 +194,8 @@ function Convert-AudioFileToVideo
 }
 
 
-$ffmpegPath = Resolve-Path -Path $ffmpegRelativePath
-Write-Host "FFMPEG ONVERTER PATH: " + $ffmpegPath -ForegroundColor Green
+$ffmpegBinPath = Resolve-Path -Path $binPath
+Write-Host "FFMPEG CONVERTER PATH: " + $ffmpegBinPath -ForegroundColor Green
 
 
 Write-Host "Ensure destination folders exist" -ForegroundColor Green
@@ -203,10 +205,11 @@ New-Item -ItemType Directory -Force -Path $audioDurationPath
 
 if ($shouldProcessImages)
 {
-	#Convert-SourceImageFiles;
+	Convert-SourceImageFiles;
 }
 
-#Convert-SourceAudioFiles
+
+Convert-SourceAudioFiles
 
 
 
