@@ -24,8 +24,10 @@ $outputPath = ".\Output\";
 
 #$ffProbe = $($ffmpegPath + "ffprobe.exe");
 #s$ffmpeg = $($ffmpegPath + "ffprobe.exe");
-$audiosSourcePath = "C:\Users\rajanik\OneDrive\Parayanam\Srimad Bhagavatam\Bhagavatam Parayanam\" #"C:\Work\ffmpegconverter\bin\";
-$imagesSourcePath = "C:\Users\rajanik\OneDrive\Photos\Krishna\";
+#$audiosSourcePath = "C:\Users\rajanik\OneDrive\Parayanam\Srimad Bhagavatam\Bhagavatam Parayanam\" #"C:\Work\ffmpegconverter\bin\";
+#$imagesSourcePath = "C:\Users\rajanik\OneDrive\Photos\Krishna\";
+$audiosSourcePath = "D:\OneDrive\Rajanikanth\OneDrive\Parayanam\Srimad Bhagavatam\Bhagavatam Parayanam\" #"C:\Work\ffmpegconverter\bin\";
+$imagesSourcePath = "D:\OneDrive\Rajanikanth\OneDrive\Photos\Krishna\";
 
 $audioDurationPath = $($outputPath + "Temp\AudioDuration\");
 $imagesDestPath = $($outputPath + "Images\");
@@ -114,7 +116,7 @@ function Get-AudioDuration
 
 	Write-Host $outAudioFile -ForegroundColor Magenta
 
-	C:\Work\ffmpegconverter\bin\ffprobe.exe -v error -select_streams a:0 -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 "$inAudioFile" > "$outAudioFile"
+	.\ffmpegconverter\bin\ffprobe.exe -v error -select_streams a:0 -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 "$inAudioFile" > "$outAudioFile"
 }
 
 function Get-VideoMetaDataFullTitle
