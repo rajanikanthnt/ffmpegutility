@@ -6,8 +6,13 @@
 
 ::Text Right to Left
 echo off
-.\ffmpegconverter\bin\ffmpeg.exe -loglevel error -stats -i input.mp4 -i logo32.png -filter_complex "[0:v][1:v]overlay=main_w-overlay_w-10:10" -f avi pipe:1 | ^
-.\ffmpegconverter\bin\ffmpeg.exe -loglevel error -stats -i pipe:0 -vf drawbox="y=(ih-40):width=iw:height=35:color=black@0.4:t=fill,drawtext=text='%~1':fontfile='c\:\/windows\/fonts\/SCRIPTBL.ttf': y=((h)-th-10):x=w-mod(max(t-2\,0)*(w+tw)/30\,(w+tw)): fontcolor=yellow: fontsize=20: shadowx=-2: shadowy=-5" ^
--vcodec libx264 -acodec aac -ab 100k -ar 48000 -ac 2 -y %2
-
+::.\ffmpegconverter\bin\ffmpeg.exe -loglevel error -stats -i input.mp4 -i logo32.png -filter_complex "[0:v][1:v]overlay=main_w-overlay_w-10:10" -f avi pipe:1 | ^
+::.\ffmpegconverter\bin\ffmpeg.exe -loglevel error -stats -i pipe:0 -vf drawbox="y=(ih-40):width=iw:height=35:color=black@0.4:t=fill,drawtext=text='%~1':fontfile='c\:\/windows\/fonts\/SCRIPTBL.ttf': y=((h)-th-10):x=w-mod(max(t-2\,0)*(w+tw)/30\,(w+tw)): fontcolor=yellow: fontsize=20: shadowx=-2: shadowy=-5" ^
+::-vcodec libx264 -acodec aac -ab 100k -ar 48000 -ac 2 -y %2
+.\ffmpegconverter\bin\ffmpeg.exe -loglevel error -stats -i input.mp4 -vf drawbox="y=(ih-40):width=iw:height=100:color=black@0.2:t=fill,drawtext=text='%~1':fontfile='c\:\/windows\/fonts\/SCRIPTBL.ttf': y=((h)-th-10):x=w-mod(max(t-2\,0)*(w+tw)/30\,(w+tw)): fontcolor=yellow: fontsize=60: shadowx=-2: shadowy=-5" ^
+-vcodec libx264 -acodec aac -ab 100k -ar 48000 -ac 2 -max_muxing_queue_size 9999 -y %2
+::.\ffmpegconverter\bin\ffmpeg.exe -loglevel error -stats -i input.mp4 -vf drawbox="y=(ih-40):width=iw:height=100:color=black@0.2:t=fill,drawtext=text='%~1':fontfile='c\:\/windows\/fonts\/SCRIPTBL.ttf': y=((h)-th-10):x=(mod(5*n\,w+tw)-tw): fontcolor=yellow: fontsize=60: shadowx=-2: shadowy=-5" ^
+::-vcodec libx264 -acodec aac -ab 100k -ar 48000 -ac 2 -max_muxing_queue_size 9999 -y %2
+::echo %1
+::copy input.mp4 %2
 %2

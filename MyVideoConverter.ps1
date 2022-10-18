@@ -26,7 +26,7 @@ $outputPath = ".\Output\";
 #s$ffmpeg = $($ffmpegPath + "ffprobe.exe");
 #$audiosSourcePath = "C:\Users\rajanik\OneDrive\Parayanam\Srimad Bhagavatam\Bhagavatam Parayanam\" #"C:\Work\ffmpegconverter\bin\";
 #$imagesSourcePath = "C:\Users\rajanik\OneDrive\Photos\Krishna\";
-$audiosSourcePath = "D:\OneDrive\Rajanikanth\OneDrive\Parayanam\Srimad Bhagavatam\Bhagavatam Parayanam\" #"C:\Work\ffmpegconverter\bin\";
+$audiosSourcePath = "D:\OneDrive\Rajanikanth\OneDrive\Parayanam\Srimad Bhagavatam\Bhagavatam Parayanam\Final\Vol 02\temp\" #"C:\Work\ffmpegconverter\bin\";
 $imagesSourcePath = "D:\OneDrive\Rajanikanth\OneDrive\Photos\Krishna\";
 
 $audioDurationPath = $($outputPath + "Temp\AudioDuration\");
@@ -34,8 +34,8 @@ $imagesDestPath = $($outputPath + "Images\");
 $videosDestPath = $($outputPath + "Videos\");
 $imageResolutionWidth = "1920";
 $imageResolutionHeight = "1080";
-$videoResolutionWidth = "480";
-$videoResolutionHeight = "360";
+$videoResolutionWidth = "1920";
+$videoResolutionHeight = "1080";
 $imagesPerVideo = 50;
 
 
@@ -146,7 +146,7 @@ function Get-VideoMetaDataFullTitle
 		$metadataVerseEnd = $videoTitle -as [string];
 	}
 
-	return "Volume {0} Chapter {1} Verse {2} to {3}" -f $metadataVolume, $metadataChapter, $metadataVerseStart, $metadataVerseEnd;
+	return "Srimad Bhagavatam Parayanam - Canto {0} Chapter {1} Verse {2} to {3}" -f $metadataVolume, $metadataChapter, $metadataVerseStart, $metadataVerseEnd;
 }
 function Convert-AudioFileToVideo
 {
@@ -172,27 +172,37 @@ function Convert-AudioFileToVideo
 	$videoTitleFull = Get-VideoMetaDataFullTitle -outVideoFileName $outVideoFile;
 
 	#run ffmpeg to create slideshow with the audio
+	Write-Host "Creating Slideshow"
 	.\ffmpegconverter\bin\ffmpeg.exe `
 	-loglevel error -stats `
 	-r $frameRate -start_number 1 `
 	-i $imagesParam `
 	-i $inAudioFile `
 	-metadata title=$videoTitleFull -metadata album=$videoAlbum -metadata album_artist=$videoAlbumArtist `
+	-s $(($videoResolutionWidth)+"x"+($videoResolutionHeight)) `
 	-c:v libx264 `
 	-pix_fmt yuv420p `
-	-s $(($videoResolutionWidth)+"x"+($videoResolutionHeight)) `
 	-c:a aac `
-	-r $frameRateRaw `
-	-strict experimental `
+	-r 30 `
 	-shortest `
-	-max_muxing_queue_size 8192 `
+	-max_muxing_queue_size 9999 `
 	-t $inAudioDuration `
+	#-vf tblend=blend=all_expr='if(gte(Y-N*SH,0),A,B)' `
 	-y .\input.mp4;
 
+	#Write-Host "Adding Fade-in"
+	#.\ffmpegconverter\bin\ffmpeg.exe -loglevel error -stats -i .\input.mp4 -vf fade=in:0:30 -y .\slide_fade_in.mp4
+	#Write-Host "Adding Fade-out"
+	#.\ffmpegconverter\bin\ffmpeg.exe -loglevel error -stats -i .\slide_fade_in.mp4 -vf fade=out:120:30 -y .\input.mp4
+
 	#Add logo and scrolling title to the video created
+	Write-Host "Adding Scrolling Title"
 	.\AddTitleAndLogo.bat $("""Srimad Bhagavatam " + $videoTitleFull + """") "$outVideoFile"
 	
 	Remove-Item -Path .\input.mp4
+
+	#-vf "tblend=average,framestep=1,setpts=0.50*PTS" `
+
 }
 
 
